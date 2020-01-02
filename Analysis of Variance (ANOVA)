@@ -72,6 +72,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, rand
 
 #for loop command to run the classification algorithms from 810 features till 10 features by reducing the count by 10 whenever a for loop is completed.
 
+# This will help to decide the value of k (features) at which the classification algorithms will provide best accuracy.
+
+
 features = range(10, 810, 10)
 for i in list(reversed(features)):
 
