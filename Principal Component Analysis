@@ -1,0 +1,194 @@
+import matplotlib.pyplot as plt # matplotlib --> to draw a 2D figure and pyplot to do changes in that figure.
+import pandas as pd  # providing high performance and it is used data manipulation and analysis
+import seaborn as sns  # to draw attractive and informational graphs (To visualize the data)
+from sklearn.model_selection import cross_val_score # sklearn is where all libraries are stored and model_selection to split data into test and train
+
+# Importing the dataset
+data = pd.read_csv('datas.csv')
+
+
+
+#removing columns with more than 25 percent missing values
+mis_col = data.columns[data.isnull().mean()>0.20]
+data = data.drop(mis_col, axis=1)
+
+# Binning the data in three categories
+
+
+bins = [0, 605000, 3100000, 15200000, 1418866360]
+labels =['verylow','low','mid','high']
+
+# Create new column name Electricity consumption
+data['EC'] = pd.cut(data['MFBTU'], bins,labels=labels)
+
+data = data.dropna()
+
+
+# Shuffle the Dataset.
+
+#frac : float, optional
+#Fraction of axis items to return. Cannot be used with n.
+# random_state --> Seed for the random number generator 
+shuffle = data.sample(frac=1,random_state=10)
+
+# Put all the energy consumption levels in a separate dataset.
+
+verylow = shuffle.loc[shuffle['EC'] == "low"]
+
+low = shuffle.loc[shuffle['EC'] == "verylow"].sample(n=678,random_state=10)
+
+#Randomly select 630 observations from the both the majority class (low )
+mid = shuffle.loc[shuffle['EC'] == 'mid'].sample(n=678,random_state=10)
+
+high = shuffle.loc[shuffle['EC'] == 'high'].sample(n=678,random_state=10)
+
+
+# Concatenate both dataframes again
+data = pd.concat([verylow, low, mid, high])
+
+
+plt.figure(figsize=(8, 8))
+sns.countplot('EC', data=data)
+plt.title('After Down Sampling')
+plt.show()
+
+#lable encoding for catagorical data
+from sklearn.preprocessing import LabelEncoder
+#lable encoding for catagorical data
+columns = data.nunique()[data.nunique() == 4].keys().tolist()
+labelEncoder = LabelEncoder()
+for i in columns :
+    data[i] = labelEncoder.fit_transform(data[i])
+    
+X = data.iloc[:, : -1].values
+y = data.iloc[:, -1].values
+
+
+#######################Principal Component Analysis#####################################################
+
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 10)
+
+
+# Applying PCA function on training 
+# and testing set of X component 
+from sklearn.decomposition import PCA 
+  
+pca = PCA(n_components = 200) 
+X1 = pca.fit_transform(X) 
+  
+explained_variance = pca.explained_variance_ratio_ 
+
+
+#############################################CLASSIFICATION ALGORITHMS******************************************************8
+
+ ########################################Gaussian Naive Bayes#################################3
+ 
+ 
+    from sklearn.naive_bayes import GaussianNB
+    gaussian = GaussianNB()
+    gaussian.fit(X_chi_train, y_chi_train)
+    # Predicting the Test set results
+    y_pred = gaussian.predict(X_chi_test)
+    
+    #10-fold cross validation score
+    accuracy = cross_val_score(estimator = gaussian, X = X_chi_train, y = y_chi_train, cv =10)
+    across_cv = accuracy.mean()
+    
+    #Confusion matrix
+    from sklearn.metrics import confusion_matrix
+    matrix = confusion_matrix(y_chi_test, y_pred)
+    
+    #Accuracy
+    from sklearn.metrics import accuracy_score
+    accuracy = accuracy_score(y_chi_test, y_pred)
+    print(i)
+    print(accuracy)
+    print(across_cv)
+
+  # Command to find F1 Score, Precision and Recall
+  
+  from sklearn.metrics import classification_report, confusion_matrix
+  print(confusion_matrix(y_test, y_pred))
+  print(classification_report(y_test, y_pred))
+
+
+
+################################# Random Forest ###########################################################
+from sklearn.ensemble import RandomForestClassifier
+randomf = RandomForestClassifier()
+randomf.fit(X_train, y_train)
+# Predicting the Test set results
+y_pred = randomf.predict(X_test)
+
+#10-fold cross validation score
+accuracy = cross_val_score(estimator = randomf, X = X_train, y = y_train, cv =10)
+randomf_cross = accuracy.mean()
+print("10-Fold Cross  Validation Score of Random Forest", randomf_cross)
+
+#Confusion matrix
+from sklearn.metrics import confusion_matrix
+matrix = confusion_matrix(y_test, y_pred)
+    
+#Accuracy
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print(accuracy)
+
+#Command to find F1 Score, Precision and Recall
+from sklearn.metrics import classification_report, confusion_matrix
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+
+
+################################### logistic Regression #######################################################
+from sklearn.linear_model import LogisticRegression
+lregression = LogisticRegression()
+lregression.fit(X_train, y_train)
+
+#10-fold cross validation score
+accuracy = cross_val_score(estimator = lregression, X = X_train, y = y_train, cv =10)
+lregression_cross = accuracy.mean()
+print("10-Fold Cross  Validation Score of LogisticRegression", lregression_cross)
+
+#Confusion matrix
+from sklearn.metrics import confusion_matrix
+matrix = confusion_matrix(y_test, y_pred)
+
+#Accuracy
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print(accuracy)
+
+#Command to find F1 Score, Precision and Recall
+from sklearn.metrics import classification_report, confusion_matrix
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+
+
+#################################### K-Nearest Neighbor##################################################
+
+from sklearn.neighbors import KNeighborsClassifier
+KNC = KNeighborsClassifier(n_neighbors=5)
+KNC.fit(X_train, y_train)
+y_pred = KNC.predict(X_test)
+
+
+#10-fold cross validation score
+accuracy = cross_val_score(estimator = KNC, X = X_train, y = y_train, cv =10)
+KNC_cross = accuracy.mean()
+print("10-Fold Cross  Validation Score of KNC", KNC_cross)
+
+#To find accuracy
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print(accuracy)
+
+
+#Command to find F1 Score, Precision and Recall
+from sklearn.metrics import classification_report, confusion_matrix
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+
