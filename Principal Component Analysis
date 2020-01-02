@@ -71,15 +71,24 @@ y = data.iloc[:, -1].values
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 10)
 
+#for loop command to run the classification algorithms from 810 features till 10 features by reducing the count by 10 whenever a for loop is completed.
+# This will help to decide the value of n_components (features) at which the classification algorithms will provide best accuracy.
+
+features = range(10, 810, 10)
+for i in list(reversed(features)):
 
 # Applying PCA function on training 
 # and testing set of X component 
 from sklearn.decomposition import PCA 
   
-pca = PCA(n_components = 200) 
+pca = PCA(n_components = i) 
 X1 = pca.fit_transform(X) 
   
 explained_variance = pca.explained_variance_ratio_ 
+
+# Splitting the dataset into the Training set and Test set
+    
+X_anova_train, X_anova_test, y_anova_train, y_anova_test = train_test_split(X_kbest, y, test_size = 0.20, random_state = 10)
 
 
 #############################################CLASSIFICATION ALGORITHMS******************************************************8
