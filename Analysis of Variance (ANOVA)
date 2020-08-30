@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt # matplotlib --> to draw a 2D figure and pyplot to do changes in that figure.
-import pandas as pd  # providing high performance and it is used data manipulation and analysis
+import pandas as pd  # providing high performance and it is used data manipulation and analysis.
 import seaborn as sns  # to draw attractive and informational graphs (To visualize the data)
 from sklearn.model_selection import cross_val_score # sklearn is where all libraries are stored and model_selection to split data into test and train
 
